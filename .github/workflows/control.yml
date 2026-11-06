@@ -1,0 +1,21 @@
+name: Source control
+on:
+  workflow_dispatch:
+    inputs:
+      result:
+        description: Expected test result
+        default: success
+        required: true
+        type: choice
+        options: [success, failure]
+permissions:
+  contents: read
+jobs:
+  ci-ok:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report selected result
+        env:
+          RESULT: ${{ inputs.result }}
+        run: test "$RESULT" = success
