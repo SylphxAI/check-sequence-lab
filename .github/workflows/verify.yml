@@ -1,0 +1,15 @@
+name: Source verification
+on:
+  pull_request:
+    branches: [workflow-base]
+  merge_group:
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify
+        run: 'true'
