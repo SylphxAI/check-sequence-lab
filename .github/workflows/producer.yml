@@ -12,4 +12,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Produce
-        run: sleep 120
+        env:
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          sleep 120
+          test "$RUN_ATTEMPT" -eq 1
