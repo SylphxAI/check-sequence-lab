@@ -1,0 +1,12 @@
+name: Fixture
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  ci-ok:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'

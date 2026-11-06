@@ -41,7 +41,12 @@ async function main() {
   const token = requireOk(broker, 'Broker');
   if (token.issuer !== 'github-apps/1299545' || token.credential_kind !== 'access_token' || token.repositories?.length !== 1 || token.repositories[0] !== repository || token.permissions?.checks !== 'write' || Object.entries(token.permissions).some(([k,v]) => k !== 'checks' && v !== 'none' && !(k === 'metadata' && v === 'read'))) throw Error('Unexpected credential scope');
   mask(token.token);
+  const identityReply = await request('https://api.github.com/installation/repositories', {headers:{authorization:`Bearer ${token.token}`,accept:'application/vnd.github+json','x-github-api-version':'2022-11-28'}});
+  const installationRepositories = requireOk(identityReply, 'Installation repositories');
+  if (installationRepositories.total_count !== 1 || installationRepositories.repositories?.[0]?.full_name !== repository) throw Error('Installation repository mismatch');
+  console.log(JSON.stringify({at:new Date().toISOString(),issuer:token.issuer,installation_repositories:installationRepositories.repositories.map(r => ({id:r.id,full_name:r.full_name})),permissions:token.permissions}));
   const receipts = [];
+  writeFileSync('receipts.json', JSON.stringify({at:new Date().toISOString(),issuer:token.issuer,installation_repositories:installationRepositories},null,2));
   for (const operation of JSON.parse(env.OPERATIONS)) {
     if (!['POST','PATCH'].includes(operation.method) || !/^check-runs(?:\/[0-9]+)?$/.test(operation.path)) throw Error('Invalid operation');
     const url = `https://api.github.com/repos/${repository}/${operation.path}`;
