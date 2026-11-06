@@ -1,5 +1,7 @@
 name: Producer
 on:
+  pull_request:
+    branches: [stable]
   workflow_dispatch:
 permissions:
   contents: read

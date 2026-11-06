@@ -1,5 +1,7 @@
 name: Source control
 on:
+  pull_request:
+    branches: [stable]
   workflow_dispatch:
     inputs:
       result:
@@ -17,5 +19,5 @@ jobs:
     steps:
       - name: Report selected result
         env:
-          RESULT: ${{ inputs.result }}
+          RESULT: ${{ inputs.result || 'success' }}
         run: test "$RESULT" = success
