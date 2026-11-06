@@ -1,0 +1,30 @@
+name: Check write
+on:
+  workflow_dispatch:
+    inputs:
+      operations:
+        description: JSON array of check-run operations
+        required: true
+        type: string
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  write:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply check operations
+        env:
+          PROBE_CI_NAME: ${{ vars.PROBE_CI_NAME }}
+          PROBE_TRUST_POLICY: ${{ vars.PROBE_TRUST_POLICY }}
+          OPERATIONS: ${{ inputs.operations }}
+        run: node scripts/check-write.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: receipts.json
+          retention-days: 7

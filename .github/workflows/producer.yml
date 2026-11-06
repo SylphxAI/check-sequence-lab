@@ -1,0 +1,13 @@
+name: Producer
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  producer:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Produce
+        run: sleep 120
